@@ -19,4 +19,4 @@ srun accelerate launch -m lm_eval --model hf \
     --use_cache $SCRATCH/eval_cache/ \
     --batch_size $BATCH_SIZE \
     --num_fewshot $NUM_FEWSHOT \
-    --wandb_args project=lm-eval-harness-integration
+    --wandb_args project=lm-eval-harness-integration,name=$SLURM_JOB_ID/$MODEL_PATH,tag=$SLURM_JOB_ID
