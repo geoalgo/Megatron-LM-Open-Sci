@@ -25,11 +25,7 @@ which
 
 You can now launch the experiments, first install slurmpilot and then call:
 ```
-pip install slurmpilot==0.1.5-dev0
-
-# adds cluster, assumes that leonardo has an entry in your ~/.ssh/config, provide hostname, user, ssh file otherwise
-sp-add-cluster --cluster leonardo --host leonardo  
-
+pip install "slurmpilot[extra] @ git+https://github.com/geoalgo/slurmpilot.git"
 python launch_eval.py
 ```
 

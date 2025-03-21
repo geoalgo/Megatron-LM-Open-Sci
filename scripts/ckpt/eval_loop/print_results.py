@@ -8,7 +8,7 @@ import wandb
 regenerate = True
 if regenerate:
     api = wandb.Api()
-    jobids = [14080774]
+    jobids = [14140172, 14141165, 14147553]
     runs = api.runs(
         path="geoalgo-university-of-freiburg/lm-eval-harness-integration",
         #filters={"tags": {"$in": [f"JOB-{jobid}"]}}
@@ -53,8 +53,11 @@ cols = [
 
 # keep only numerics
 df = df.select_dtypes(include=['number'])
+df = df[cols]
+df["Average"] = df.mean(axis=1)
 
+cols.append("Average")
 #df.index = [x.replace("leonardo_work/EUHPC_E03_068/marianna/megatron_lm_reference/checkpoints/hf/open-sci-ref_model-", "") for x in df.index]
-print(df[cols].to_string(float_format='%.2f'))
+print(df[cols].sort_values(by="Average", ascending=False).to_string(float_format='%.2f'))
 
 df[cols].to_csv("results-filtered.csv", index=True)

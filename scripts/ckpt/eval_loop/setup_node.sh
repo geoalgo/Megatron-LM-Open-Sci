@@ -15,11 +15,10 @@ export HF_HOME=/leonardo_scratch/large/userexternal/$USER/HF_cache
 mkdir -p $HF_HOME
 TASKS="commonsense_qa,piqa,winogrande,arc_challenge,arc_easy,mmlu,hellaswag,copa,openbookqa,lambada_openai,winogrande,boolq,mmlu_pro"
 
+# Run a tiny model on all datasets to make sure they are all available locally
 lm_eval --model hf \
     --model_args pretrained=EleutherAI/pythia-160m,revision=step100000,dtype="float" \
     --tasks $TASKS \
-    --output_path $SCRATCH/eval_results/ \
-    --use_cache $SCRATCH/eval_cache/ \
     --batch_size "auto" \
     --limit 1 \
     --device cpu
