@@ -12,7 +12,9 @@ on Slurm nodes.
 You can do the following:
 ```
 ssh leonardo
-bash setup_node.sh
+git clone https://github.com/geoalgo/Megatron-LM-Open-Sci.git
+git checkout eval_loop
+bash scripts/ckpt/eval_loop/setup_node.sh
 ```
 
 which
@@ -26,9 +28,20 @@ which
 You can now launch the experiments, first install slurmpilot and then call:
 ```
 pip install "slurmpilot[extra] @ git+https://github.com/geoalgo/slurmpilot.git"
+cd scripts/ckpt/eval_loop/
 python launch_eval.py
 ```
 
 which will launch all evaluations.
 
 Results will be logged in wandb but you will have to sync them as nodes are cut from internet.
+Once results are in WANDB, you can do the following to get the table of all results (you should update the list of 
+jobids manually).
+
+```
+cd scripts/ckpt/eval_loop/
+python print_results.py
+```
+
+If you want you can also show the results for a certain group of Slurm jobs, 
+`python print_results --jobids 14140172 14141165 14147553 14170824`.
