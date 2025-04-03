@@ -7,10 +7,9 @@ import wandb
 
 
 def main(jobids: list[str]):
-    regenerate = True
+    regenerate = False
     if regenerate:
         api = wandb.Api()
-        #jobids = [14140172, 14141165, 14147553, 14170824]
         runs = api.runs(
             path="geoalgo-university-of-freiburg/lm-eval-harness-integration",
             # filters={"tags": {"$in": [f"JOB-{jobid}"]}}
@@ -34,6 +33,22 @@ def main(jobids: list[str]):
 
         df = pd.DataFrame(model_evals).T
         df.index.name = "checkpoint"
+
+        # add iteration column, detect it from checkpoint name
+        def extract_iteration_from_checkpoint(checkpoint_name: str):
+            from pathlib import Path
+            # /.../iter_0106000 => 106000
+            name = Path(checkpoint_name).stem
+            if name.startswith("iter_"):
+                number = name[len("iter_"):]
+                try:
+                    return int(str(number).lstrip('0'))
+                except ValueError:
+                    return None
+            else:
+                return None
+        df["iteration"] = [extract_iteration_from_checkpoint(checkpoint_name) for checkpoint_name in df.index]
+
         df.to_csv("results.csv", index=True)
         print(len(selected_runs))
 
@@ -53,22 +68,19 @@ def main(jobids: list[str]):
         "hellaswag/acc_norm",
         # "piqa/acc",
         "piqa/acc_norm",
+        "iteration",
     ]
-
-    # df.columns = [col.split("/")[0] for col in df.columns]
-    # whacky
-    # cols = [col.split("/")[0] for col in cols]
 
     # keep only numerics
     df = df.select_dtypes(include=['number'])
     df = df[cols]
     df["Average"] = df.mean(axis=1)
+    index = df["Average"].dropna().index
 
     cols.append("Average")
-    # df.index = [x.replace("leonardo_work/EUHPC_E03_068/marianna/megatron_lm_reference/checkpoints/hf/open-sci-ref_model-", "") for x in df.index]
-    print(df[cols].sort_values(by="Average", ascending=False).to_string(float_format='%.2f'))
+    print(df.loc[index, cols].sort_values(by="Average", ascending=False).to_string(float_format='%.2f'))
 
-    df[cols].to_csv("results-filtered.csv", index=True)
+    df.loc[index, cols].to_csv("results-filtered.csv", index=True)
 
 
 if __name__ == '__main__':
