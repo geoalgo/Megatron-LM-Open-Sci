@@ -11,6 +11,10 @@ n_fewshot_to_tasks = {
     10: ["commonsense_qa", "piqa", "arc_challenge", "arc_easy", "hellaswag", "boolq"],
 }
 
+models_file = "models.txt"
+with open(models_file, "r") as f:
+    model_paths = f.readlines()
+
 # List of models to evaluate
 # model_paths = [
 #     # "/leonardo_work/EUHPC_E03_068/marianna/megatron_lm_reference/checkpoints/hf/open-sci-ref_model-1.3b_data-HPLT-2.0_tokenizer-GPT-NeoX_samples-300B_global_bs-1008_context-4096_schedule-WSD_lr-4e-3_warmup-25000_machine-LEONARDO_13686118",
@@ -29,16 +33,15 @@ n_fewshot_to_tasks = {
 #     # "HuggingFaceTB/SmolLM2-1.7B",
 # ]
 
-models_file = "models.txt"
-with open(models_file, "r") as f:
-    model_paths = f.readlines()
 
 # remove "\n" at the end of each string
 model_paths = [x.strip() for x in model_paths]
+
+# loop over all models first, then all tasks
 python_args = [
     f"{','.join(tasks)} {n_fewshot} {model_path}"
-    for n_fewshot, tasks in n_fewshot_to_tasks.items()
     for model_path in model_paths
+    for n_fewshot, tasks in n_fewshot_to_tasks.items()
 ]
 
 
@@ -57,9 +60,7 @@ export LM_EVAL_OUTPUT_PATH="/leonardo_scratch/large/userexternal/$USER"
 print(f"{len(python_args)} jobs.")
 
 
-starting_index = 500
-n_jobs = 500
-python_args = python_args[starting_index:starting_index + n_jobs]
+# 14798246
 
 job = JobCreationInfo(
     cluster="leonardo",
